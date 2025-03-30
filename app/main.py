@@ -7,7 +7,6 @@ from app.database import Base, engine, create_db
 async def lifespan(app: FastAPI):
     await create_db()
     yield
-    print('Closed')
 
 app = FastAPI(lifespan=lifespan)
 
