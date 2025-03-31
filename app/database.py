@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from app.models import Base
+from app.models import Base, User
 
 DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
@@ -10,7 +10,14 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False,
 
 async def create_db():
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+
+    async with SessionLocal() as session:
+        session.add(User(user_id='000', username='admin',
+                         grade='admin', access_token='000',
+                         refresh_token='000'))
+        await session.commit()
 
 async def get_session():
     async with SessionLocal() as db:

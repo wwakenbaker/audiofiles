@@ -8,15 +8,19 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    user_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
+    access_token: Mapped[str] = mapped_column(unique=True)
+    refresh_token: Mapped[str] = mapped_column(unique=True)
+    grade : Mapped[str] = mapped_column(default='User')
 
     audio_files = relationship("AudioFile", back_populates="owner")
 
 class AudioFile(Base):
     __tablename__ = "audio_files"
 
-    file_id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    file_name: Mapped[str] = mapped_column()
     file_path: Mapped[str] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
 
