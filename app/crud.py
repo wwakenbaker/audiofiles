@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from app.config import TOKEN_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, USER_INFO_URL, AUTHORIZATION_URL
 from app.models import User, AudioFile
+from app.schemas import AudioFileResponse
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=AUTHORIZATION_URL,
@@ -100,26 +101,29 @@ async def delete_user_service(code, login, db):
         return "Insufficient privileges"
 
 async def upload_audio_service(code, audio_file, file_name, db):
+    # Получение пользователя из базы данных
     user = await db.execute(select(User).where(User.access_token == code))
     user = user.scalars().one()
 
+    # Создание пути для сохранения файла
     file_path = f"uploads/{user.username}/{file_name}"
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    # Сохранение содержимого файла
     with open(file_path, "wb") as f:
         contents = await audio_file.read()
         f.write(contents)
 
-    audio_file = AudioFile(user_id=user.id, file_name=file_name, file_path=file_path)
-    db.add(audio_file)
+    # Сохранение информации о файле в базе данных
+    audio_file_record = AudioFile(user_id=user.user_id, file_name=file_name, file_path=file_path)
+    db.add(audio_file_record)
     await db.commit()
-
-    return "Audio uploaded"
 
 async def get_user_audio_files_service(code, db):
     user = await db.execute(select(User).where(User.access_token == code))
     user = user.scalars().one()
 
-    audio_files = await db.execute(select(AudioFile).where(AudioFile.user_id == user.id))
+    audio_files = await db.execute(select(AudioFile).where(AudioFile.user_id == user.user_id))
     audio_files = audio_files.scalars().all()
 
     file_info = [{"file_name": file.file_name, "file_path": file.file_path} for file in audio_files]
