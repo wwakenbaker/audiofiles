@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -12,9 +13,10 @@ class User(Base):
     username: Mapped[str] = mapped_column(unique=True)
     access_token: Mapped[str] = mapped_column(unique=True)
     refresh_token: Mapped[str] = mapped_column(unique=True)
-    grade : Mapped[str] = mapped_column(default='User')
+    grade: Mapped[str] = mapped_column(default="User")
 
     audio_files = relationship("AudioFile", back_populates="owner")
+
 
 class AudioFile(Base):
     __tablename__ = "audio_files"
