@@ -21,7 +21,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgres@audio_service-db-1:5432/postgres
     depends_on:
       - db
     ports:

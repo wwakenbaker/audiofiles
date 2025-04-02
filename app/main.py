@@ -33,7 +33,6 @@ def login():
         f"{AUTHORIZATION_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
     )
 
-
 @app.get("/auth")
 async def authorization(code: str, db: Session = Depends(get_session)):
     return await authorization_service(code, db)
